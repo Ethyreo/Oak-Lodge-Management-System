@@ -65,7 +65,7 @@ export default function AuthGate({ onUnlock }) {
                 </div>
 
                 <form onSubmit={verifyPin}>
-                    <div className="flex justify-center gap-3 md:gap-4 mb-4">
+                    <div className="flex justify-center gap-2 sm:gap-3 mb-4">
                         {pin.map((digit, index) => (
                             <input
                                 key={index}
@@ -78,7 +78,7 @@ export default function AuthGate({ onUnlock }) {
                                 onChange={(e) => handleInput(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 className={clsx(
-                                    "w-10 h-12 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold rounded-xl border-2 transition-all outline-none",
+                                    "w-8 h-10 sm:w-11 sm:h-14 text-center text-xl font-bold rounded-xl border-2 transition-all outline-none",
                                     error ? "border-rose-400 bg-rose-50 text-rose-600" :
                                         digit ? "border-slate-800 bg-slate-50" : "border-slate-200 bg-white focus:border-slate-400"
                                 )}
