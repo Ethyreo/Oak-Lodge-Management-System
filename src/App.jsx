@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BulkDataEntry from './components/BulkDataEntry';
+import HistoricalTenants from './components/HistoricalTenants';
 import AuthGate from './components/AuthGate';
 import Dashboard from './components/Dashboard';
 import FilterBar from './components/FilterBar';
@@ -13,7 +14,7 @@ function App() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [updateTrigger, setUpdateTrigger] = useState(0);
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'bulk'
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'bulk' | 'history'
 
   if (!isUnlocked) {
     return <AuthGate onUnlock={() => setIsUnlocked(true)} />;
@@ -41,7 +42,13 @@ function App() {
               <BuildingVisualMap key={`bg-${updateTrigger}`} onSelectUnit={setSelectedUnit} />
 
               {/* Navigation & Controls */}
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end gap-3 mb-4 flex-wrap">
+                <button
+                  onClick={() => setCurrentView('history')}
+                  className="bg-white border border-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-xl shadow-sm hover:bg-slate-50 transition-colors"
+                >
+                  Tenant Directory
+                </button>
                 <button
                   onClick={() => setCurrentView('bulk')}
                   className="bg-slate-900 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:bg-slate-800 transition-colors"
@@ -53,10 +60,14 @@ function App() {
               <FilterBar key={`fb-${updateTrigger}`} />
               <Dashboard key={`db-${updateTrigger}`} />
             </>
-          ) : (
+          ) : currentView === 'bulk' ? (
             <BulkDataEntry
               key={`bulk-${updateTrigger}`}
               triggerUpdate={() => setUpdateTrigger(prev => prev + 1)}
+              onBack={() => setCurrentView('home')}
+            />
+          ) : (
+            <HistoricalTenants
               onBack={() => setCurrentView('home')}
             />
           )}

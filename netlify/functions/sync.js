@@ -9,7 +9,7 @@ export const handler = async (event, context) => {
 
     try {
         const payload = JSON.parse(event.body);
-        const { month, rows: payloadRows } = payload;
+        const { month, rows: payloadRows, tenantRows } = payload;
 
         // Initialize Google Service Account Auth
         // Natively pulls from Netlify Environment Variables at runtime
@@ -40,6 +40,21 @@ export const handler = async (event, context) => {
         }
 
         await sheet.addRows(payloadRows);
+
+        // --- 2. Synchronize Tenant Directory ---
+        if (tenantRows && tenantRows.length > 0) {
+            console.log(`[Netlify Serverless] Syncing Tenant Directory (${tenantRows.length} tenants)...`);
+            let tenantSheet = doc.sheetsByTitle['Oak Lodge Tenant Directory'];
+            if (!tenantSheet) {
+                tenantSheet = await doc.addSheet({
+                    title: 'Oak Lodge Tenant Directory',
+                    headerValues: ['UnitID', 'UnitName', 'TenantName', 'Company', 'JoinDate', 'LeaveDate']
+                });
+            }
+            // For the global tenant directory, it's safest to rewrite the entire sheet to capture all historical amendments
+            await tenantSheet.clearRows();
+            await tenantSheet.addRows(tenantRows);
+        }
 
         return {
             statusCode: 200,

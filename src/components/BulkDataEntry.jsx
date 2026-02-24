@@ -28,7 +28,7 @@ export default function BulkDataEntry({ triggerUpdate, onBack }) {
                 const currentRent = getCurrentRentAmount(unit, month);
 
                 initialDraft[unit.id] = {
-                    rentStatus: records.rentStatus || 'unknown',
+                    rentStatus: records.rentStatus || 'unpaid',
                     rentAmount: currentRent, // Pre-fill with calculated amount
                     elecBill: records.elecBill || 0,
                     waterBill: records.waterBill || 0,
@@ -62,10 +62,25 @@ export default function BulkDataEntry({ triggerUpdate, onBack }) {
 
         // Build the Row Payload for Google Sheets
         const payloadRows = [];
+        const tenantRows = [];
 
         buildingData.floors.forEach(floor => {
             floor.units.forEach(unit => {
                 if (unit.isPrivate) return;
+
+                // Sync Tenant Directory as well
+                if (unit.tenantHistory && unit.tenantHistory.length > 0) {
+                    unit.tenantHistory.forEach(tenant => {
+                        tenantRows.push({
+                            UnitID: unit.id,
+                            UnitName: unit.name,
+                            TenantName: tenant.name,
+                            Company: tenant.company || '',
+                            JoinDate: tenant.joinDate,
+                            LeaveDate: tenant.leaveDate || 'Current'
+                        });
+                    });
+                }
 
                 const draft = draftData[unit.id];
                 if (!draft) return;
@@ -102,7 +117,7 @@ export default function BulkDataEntry({ triggerUpdate, onBack }) {
             const res = await fetch('/.netlify/functions/sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ month: selectedMonth, rows: payloadRows })
+                body: JSON.stringify({ month: selectedMonth, rows: payloadRows, tenantRows })
             });
 
             if (res.ok) {

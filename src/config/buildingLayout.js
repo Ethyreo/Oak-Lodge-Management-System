@@ -9,6 +9,9 @@ export const buildingData = {
                     name: "Owner's Residence (Upper)",
                     type: "Private",
                     contact: "Private",
+                    tenantHistory: [
+                        { name: "Suresh Duggal", company: "Owner", joinDate: "2010-01-01", leaveDate: null }
+                    ],
                     rentHistory: [],
                     elecUnit: "MAIN-01",
                     waterConn: "WTR-01",
@@ -47,6 +50,10 @@ export const buildingData = {
                     name: "SILVER OAK BnB",
                     type: "Single Large Unit",
                     contact: "+91 98765 43210",
+                    tenantHistory: [
+                        { name: "Rahul Sharma", company: "Silver Oak Tourism", joinDate: "2024-03-01", leaveDate: null },
+                        { name: "Priya Singh", company: "Mountain View Stays", joinDate: "2022-01-15", leaveDate: "2024-02-28" }
+                    ],
                     rentHistory: [{ amount: 120000, startMonth: "2026-01", endMonth: "2026-11" }],
                     elecUnit: "MET-401",
                     waterConn: "WTR-401",
@@ -67,6 +74,9 @@ export const buildingData = {
                     name: "3rd Floor 2BHK",
                     type: "2BHK Flat",
                     contact: "+91 91234 56789",
+                    tenantHistory: [
+                        { name: "Amit Kumar", company: "TCS", joinDate: "2025-06-01", leaveDate: null }
+                    ],
                     rentHistory: [{ amount: 35000, startMonth: "2026-01", endMonth: "2026-02" }], // Expiring this cycle for the alert
                     elecUnit: "MET-301",
                     waterConn: "WTR-301",
@@ -98,6 +108,10 @@ export const buildingData = {
                     name: "2nd Floor 2BHK (A)",
                     type: "2BHK Flat",
                     contact: "+91 98877 66554",
+                    tenantHistory: [
+                        { name: "Vikram Malhotra", company: "Infosys", joinDate: "2023-11-01", leaveDate: null },
+                        { name: "Sneha Gupta", company: "Wipro", joinDate: "2021-08-10", leaveDate: "2023-10-31" }
+                    ],
                     rentHistory: [{ amount: 35000, startMonth: "2026-01", endMonth: "2026-11" }],
                     elecUnit: "MET-201",
                     waterConn: "WTR-201",
@@ -152,6 +166,9 @@ export const buildingData = {
                     name: "1st Floor Small Flat",
                     type: "Small Flat",
                     contact: "+91 94433 22110",
+                    tenantHistory: [
+                        { name: "Aditi Rao", company: "Freelancer", joinDate: "2025-01-10", leaveDate: null }
+                    ],
                     rentHistory: [{ amount: 20000, startMonth: "2026-01", endMonth: "2026-02" }], // Expiring this cycle
                     elecUnit: "MET-102",
                     waterConn: "WTR-102",
