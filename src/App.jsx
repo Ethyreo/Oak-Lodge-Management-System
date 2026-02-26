@@ -13,7 +13,8 @@ import { buildingData } from './config/buildingLayout';
 import { fetchBuildingStateFromCloud } from './utils/cloudSync';
 import { AnimatePresence } from 'framer-motion';
 import LedgerTable from './components/LedgerTable';
-import { Loader2 } from 'lucide-react';
+import RentReceiptGenerator from './components/RentReceiptGenerator';
+import { Loader2, FileText } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
@@ -148,6 +149,12 @@ function App() {
                   Tenant Directory
                 </button>
                 <button
+                  onClick={() => setCurrentView('receipt')}
+                  className="bg-white border border-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-xl shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
+                >
+                  <FileText size={16} /> Rent Receipt
+                </button>
+                <button
                   onClick={() => setCurrentView('bulk')}
                   className="bg-slate-900 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:bg-slate-800 transition-colors"
                 >
@@ -166,6 +173,10 @@ function App() {
           ) : currentView === 'bulk' ? (
             <BulkDataEntry
               triggerUpdate={() => setUpdateTrigger(prev => prev + 1)}
+              onBack={() => setCurrentView('home')}
+            />
+          ) : currentView === 'receipt' ? (
+            <RentReceiptGenerator
               onBack={() => setCurrentView('home')}
             />
           ) : (
