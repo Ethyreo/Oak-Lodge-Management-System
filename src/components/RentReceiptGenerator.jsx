@@ -219,21 +219,12 @@ const generateReceiptPDF = (unit, tenant, month, records, rentAmount) => {
     doc.setTextColor(6, 95, 70); // emerald-800
     doc.text('✓  PAYMENT STATUS: PAID', pageW / 2, y + 9, { align: 'center' });
 
-    // ─── Signature Section ─────
-    y += 28;
-    doc.setDrawColor(203, 213, 225); // slate-300
-    doc.setLineWidth(0.3);
-
-    // Tenant signature
-    doc.line(marginL, y + 15, marginL + 65, y + 15);
-    doc.setFont('helvetica', 'normal');
+    // ─── Digital Disclaimer ─────
+    y += 20;
+    doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("Tenant's Signature", marginL, y + 21);
-
-    // Owner signature
-    doc.line(marginR - 65, y + 15, marginR, y + 15);
-    doc.text("Property Owner's Signature", marginR - 65, y + 21);
+    doc.text('This is a digitally generated receipt. No signature is required.', pageW / 2, y, { align: 'center' });
 
     // ─── Footer ─────
     const footerY = doc.internal.pageSize.getHeight() - 18;

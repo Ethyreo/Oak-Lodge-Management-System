@@ -80,7 +80,7 @@ export default function BuildingVisualMap({ onSelectUnit }) {
                                             "absolute inset-0 flex items-center justify-center text-[10px] sm:text-xs font-bold uppercase tracking-wider z-10",
                                             unit.isProminent ? "text-slate-100" : "text-slate-600"
                                         )}>
-                                            {unit.isPrivate ? 'PRIVATE' : unit.id}
+                                            {unit.isPrivate ? 'PRIVATE' : unit.name}
                                         </span>
                                     </motion.button>
                                 );

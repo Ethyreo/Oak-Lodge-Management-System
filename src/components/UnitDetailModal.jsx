@@ -4,6 +4,7 @@ import { X, Copy, CheckCircle2, History, Banknote, Bolt, Droplet, Trash2, Indian
 import { getCurrentRentRecord, getCurrentRentAmount } from '../utils/rentUtils';
 import { getCurrentBillingMonth } from '../utils/dateUtils';
 import { pushBuildingStateToCloud } from '../utils/cloudSync';
+import { getActiveTenant } from '../utils/tenantLogic';
 import clsx from 'clsx';
 
 export default function UnitDetailModal({ unit, onClose, onUpdate }) {
@@ -113,6 +114,17 @@ export default function UnitDetailModal({ unit, onClose, onUpdate }) {
                             <>
                                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{unit.name}</h2>
                                 <p className="text-slate-500 font-medium tracking-wide mt-1">{unit.type} • Unit {unit.id}</p>
+                                {(() => {
+                                    const activeTenant = getActiveTenant(unit.tenantHistory);
+                                    return activeTenant ? (
+                                        <p className="text-sm font-bold text-emerald-600 mt-1.5 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block" />
+                                            {activeTenant.name}
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm font-bold text-slate-400 mt-1.5">Vacant</p>
+                                    );
+                                })()}
                             </>
                         )}
                     </div>
