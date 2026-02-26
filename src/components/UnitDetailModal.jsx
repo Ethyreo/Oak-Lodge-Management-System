@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Phone, IndianRupee, Zap, Droplet, Trash2, Edit2, Save } from 'lucide-react';
-import clsx from 'clsx';
+import { X, Copy, CheckCircle2, History, Banknote, Bolt, Droplet, Trash2, IndianRupee, AlertCircle, Edit2, Save, Phone, Zap } from 'lucide-react';
 import { getCurrentRentRecord, getCurrentRentAmount } from '../utils/rentUtils';
+import { getCurrentBillingMonth } from '../utils/dateUtils';
+import { pushBuildingStateToCloud } from '../utils/cloudSync';
+import clsx from 'clsx';
 
 export default function UnitDetailModal({ unit, onClose, onUpdate }) {
-    if (!unit) return null;
-
-    const currentMonth = "2026-02";
+    const currentMonth = getCurrentBillingMonth();
     const records = unit.monthlyRecords?.[currentMonth] || {};
 
     // Get the active rent cycle explicitly
@@ -74,24 +74,29 @@ export default function UnitDetailModal({ unit, onClose, onUpdate }) {
         unit.monthlyRecords[currentMonth].garbageBill = Number(formData.garbageBill) || 0;
 
         setIsEditing(false);
-        if (onUpdate) onUpdate(); // Trigger parent re-render
+
+        // --- Phase 8: Database Integrity ---
+        // Push this unit's fresh profile and utility config upstream securely
+        pushBuildingStateToCloud(currentMonth).then(() => {
+            if (onUpdate) onUpdate(); // Trigger parent re-render globally
+        });
     };
 
     return (
-        <>
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={onClose}
-                className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             />
             <motion.div
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed bottom-0 inset-x-0 bg-white rounded-t-[2rem] z-50 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-slate-200"
+                className="relative bg-white rounded-t-[2rem] p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-slate-200 w-full max-w-5xl mx-auto"
             >
                 <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" />
 
@@ -268,6 +273,6 @@ export default function UnitDetailModal({ unit, onClose, onUpdate }) {
                     </div>
                 )}
             </motion.div>
-        </>
+        </div>
     );
 }

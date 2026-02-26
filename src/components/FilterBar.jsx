@@ -4,16 +4,90 @@ import { buildingData } from '../config/buildingLayout';
 import { Filter, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const MultiSelectPopover = ({ label, options = [], selected = [], onChange, isDropOpen, onToggle }) => {
+    const toggleOption = (optValue) => {
+        const safeSelected = Array.isArray(selected) ? selected : [];
+        if (safeSelected.includes(optValue)) {
+            onChange(safeSelected.filter(val => val !== optValue));
+        } else {
+            onChange([...safeSelected, optValue]);
+        }
+    };
+
+    const safeSelected = Array.isArray(selected) ? selected : [];
+    const safeOptions = Array.isArray(options) ? options : [];
+
+    const displayLabel = safeSelected.length === 0
+        ? `All ${label}s`
+        : safeSelected.length === 1
+            ? safeOptions.find(o => o.value === safeSelected[0])?.label || safeSelected[0]
+            : `${safeSelected.length} Selected`;
+
+    return (
+        <div className="relative flex-1">
+            <button
+                onClick={onToggle}
+                className="flex items-center gap-2 w-full px-4 py-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl text-sm text-slate-700 font-medium transition-colors shadow-sm justify-between"
+            >
+                <div className="flex flex-col items-start gap-1 w-full overflow-hidden">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">{label}</span>
+                    <span className="truncate w-full text-left leading-none font-bold">{displayLabel}</span>
+                </div>
+            </button>
+
+            {isDropOpen && (
+                <>
+                    {/* Invisible Backdrop to catch outside clicks */}
+                    <div className="fixed inset-0 z-40" onClick={onToggle}></div>
+
+                    <div className="absolute flex flex-col top-full left-0 mt-2 min-w-[220px] bg-white border border-slate-200 shadow-xl rounded-xl z-50 overflow-hidden py-1">
+                        <div className="px-3 py-2 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mr-3">{label}s Filter</span>
+                            {selected.length > 0 && (
+                                <button
+                                    onClick={() => onChange([])}
+                                    className="text-[10px] font-bold text-blue-600 hover:text-blue-800 shrink-0"
+                                >
+                                    Clear
+                                </button>
+                            )}
+                        </div>
+                        <div className="max-h-[240px] overflow-y-auto p-2 space-y-1 bg-white">
+                            {safeOptions.map(opt => {
+                                const isSelected = safeSelected.includes(opt.value);
+                                return (
+                                    <label key={opt.value} className="flex items-center gap-3 px-2 py-2 hover:bg-slate-50 rounded-lg cursor-pointer group transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleOption(opt.value)}
+                                            className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-500 cursor-pointer"
+                                        />
+                                        <span className={`text-sm ${isSelected ? 'font-bold text-slate-900' : 'font-medium text-slate-600 group-hover:text-slate-900'}`}>
+                                            {opt.label}
+                                        </span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
 export default function FilterBar() {
     const { filters, updateFilter, resetFilters } = useFilters();
     const [isOpen, setIsOpen] = React.useState(false);
+    const [openDropdown, setOpenDropdown] = React.useState(null);
 
     // Derive unique options
     const allUnits = buildingData.floors.flatMap(f => f.units).filter(u => !u.isPrivate);
     const elecMeters = [...new Set(allUnits.map(u => u.elecUnit))];
     const waterConns = [...new Set(allUnits.map(u => u.waterConn))];
 
-    const hasActiveFilters = Object.values(filters).some(v => v !== 'all');
+    const hasActiveFilters = Object.values(filters).some(arr => arr && arr.length > 0);
 
     return (
         <div className="mb-6 z-20 relative">
@@ -39,68 +113,48 @@ export default function FilterBar() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="relative z-30"
                     >
                         <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
 
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Floor</label>
-                                <select
-                                    value={filters.floor}
-                                    onChange={(e) => updateFilter('floor', e.target.value)}
-                                    className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-slate-400 focus:border-slate-400 block w-full p-2.5 outline-none font-medium"
-                                >
-                                    <option value="all">All Floors</option>
-                                    {buildingData.floors.filter(f => f.level < 5).map(f => (
-                                        <option key={f.level} value={f.level}>{f.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <MultiSelectPopover
+                                label="Floor"
+                                options={buildingData.floors.filter(f => f.level < 5).map(f => ({ value: f.level.toString(), label: f.name }))}
+                                selected={filters.floor || []}
+                                onChange={(val) => updateFilter('floor', val)}
+                                isDropOpen={openDropdown === 'floor'}
+                                onToggle={() => setOpenDropdown(openDropdown === 'floor' ? null : 'floor')}
+                            />
 
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Unit</label>
-                                <select
-                                    value={filters.unit}
-                                    onChange={(e) => updateFilter('unit', e.target.value)}
-                                    className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-slate-400 focus:border-slate-400 block w-full p-2.5 outline-none font-medium"
-                                >
-                                    <option value="all">All Units</option>
-                                    {allUnits.map(u => (
-                                        <option key={u.id} value={u.id}>{u.name} ({u.id})</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <MultiSelectPopover
+                                label="Unit"
+                                options={allUnits.map(u => ({ value: u.id, label: `${u.name} (${u.id})` }))}
+                                selected={filters.unit || []}
+                                onChange={(val) => updateFilter('unit', val)}
+                                isDropOpen={openDropdown === 'unit'}
+                                onToggle={() => setOpenDropdown(openDropdown === 'unit' ? null : 'unit')}
+                            />
 
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Elec. Meter</label>
-                                <select
-                                    value={filters.elec}
-                                    onChange={(e) => updateFilter('elec', e.target.value)}
-                                    className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-slate-400 focus:border-slate-400 block w-full p-2.5 outline-none font-medium"
-                                >
-                                    <option value="all">All Meters</option>
-                                    {elecMeters.map(m => (
-                                        <option key={m} value={m}>{m}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <MultiSelectPopover
+                                label="Elec. Meter"
+                                options={elecMeters.map(m => ({ value: m, label: m }))}
+                                selected={filters.elec || []}
+                                onChange={(val) => updateFilter('elec', val)}
+                                isDropOpen={openDropdown === 'elec'}
+                                onToggle={() => setOpenDropdown(openDropdown === 'elec' ? null : 'elec')}
+                            />
 
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Water Conn.</label>
-                                <select
-                                    value={filters.water}
-                                    onChange={(e) => updateFilter('water', e.target.value)}
-                                    className="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-slate-400 focus:border-slate-400 block w-full p-2.5 outline-none font-medium"
-                                >
-                                    <option value="all">All Connections</option>
-                                    {waterConns.map(w => (
-                                        <option key={w} value={w}>{w}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <MultiSelectPopover
+                                label="Water Conn"
+                                options={waterConns.map(w => ({ value: w, label: w }))}
+                                selected={filters.water || []}
+                                onChange={(val) => updateFilter('water', val)}
+                                isDropOpen={openDropdown === 'water'}
+                                onToggle={() => setOpenDropdown(openDropdown === 'water' ? null : 'water')}
+                            />
 
                         </div>
                     </motion.div>

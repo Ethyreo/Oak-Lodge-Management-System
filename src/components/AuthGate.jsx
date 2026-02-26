@@ -43,11 +43,16 @@ export default function AuthGate({ onUnlock }) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 sm:p-8">
+        <div
+            className="min-h-screen flex items-center justify-center p-6 sm:p-8 bg-slate-900 bg-cover bg-center bg-no-repeat relative"
+            style={{ backgroundImage: `url('/bg.jpg')` }}
+        >
+            {/* Dark overlay for readability */}
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-sm bg-white rounded-[2rem] p-8 shadow-2xl relative overflow-hidden"
+                className="w-full max-w-sm bg-white/95 backdrop-blur-md rounded-[2rem] p-8 shadow-2xl relative overflow-hidden z-10"
             >
                 <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200"></div>
 

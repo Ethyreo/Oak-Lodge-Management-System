@@ -2,13 +2,15 @@ import React, { useMemo } from 'react';
 import { buildingData } from '../config/buildingLayout';
 import MetricCard from './MetricCard';
 import { IndianRupee, Zap, Droplet, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { useFilters } from '../context/FilterContext';
 import { getCurrentRentAmount } from '../utils/rentUtils';
+import { getCurrentBillingMonth } from '../utils/dateUtils';
 
 export default function Dashboard() {
     const { filters } = useFilters();
-    const currentMonth = "2026-02";
+    // Current System Billing Period
+    const currentMonth = getCurrentBillingMonth();
 
     // Calculate Aggregates based on filters
     const metrics = useMemo(() => {
@@ -19,54 +21,70 @@ export default function Dashboard() {
         let rentCollected = 0;
         let rentDue = 0;
 
-        // Graph Data
-        const floorData = [];
+        // Phase 16: Historical Trend Data (Starts Jan 2026)
+        const utilityTrendMap = {}; // Key: "YYYY-MM", Value: { elecTotal, waterTotal }
+
+        // Generate baseline months up to current
+        const startYear = 2026;
+        const startMonth = 1;
+
+        const [currYrStr, currMoStr] = currentMonth.split('-');
+        const currentYearNum = parseInt(currYrStr, 10);
+        const currentMonthNum = parseInt(currMoStr, 10);
+
+        for (let y = startYear; y <= currentYearNum; y++) {
+            const mStart = (y === startYear) ? startMonth : 1;
+            const mEnd = (y === currentYearNum) ? currentMonthNum : 12;
+            for (let m = mStart; m <= mEnd; m++) {
+                const monthStr = `${y}-${String(m).padStart(2, '0')}`;
+                utilityTrendMap[monthStr] = { month: monthStr, elecTotal: 0, waterTotal: 0 };
+            }
+        }
 
         buildingData.floors.forEach(floor => {
-            // Basic Filter skip
-            if (filters.floor !== 'all' && filters.floor !== floor.level.toString()) return;
-
-            let floorRent = 0;
-            let floorElec = 0;
+            if (filters.floor?.length > 0 && !filters.floor.includes(floor.level.toString())) return;
 
             floor.units.forEach(unit => {
                 if (unit.isPrivate) return;
-                if (filters.unit !== 'all' && filters.unit !== unit.id) return;
-                if (filters.elec !== 'all' && filters.elec !== unit.elecUnit) return;
-                if (filters.water !== 'all' && filters.water !== unit.waterConn) return;
+                if (filters.unit?.length > 0 && !filters.unit.includes(unit.id)) return;
+                if (filters.elec?.length > 0 && !filters.elec.includes(unit.elecUnit)) return;
+                if (filters.water?.length > 0 && !filters.water.includes(unit.waterConn)) return;
 
-                const records = unit.monthlyRecords?.[currentMonth] || {};
-
+                // Only process current month for KPI tops
+                const currentRecords = unit.monthlyRecords?.[currentMonth] || {};
                 const rentAmount = getCurrentRentAmount(unit, currentMonth);
-                totalRent += rentAmount;
-                floorRent += rentAmount;
 
-                if (records.rentStatus === 'paid') {
+                totalRent += rentAmount;
+
+                if (currentRecords.rentStatus === 'paid') {
                     rentCollected += rentAmount;
-                } else if (records.rentStatus === 'unpaid' || records.rentStatus === 'overdue') {
+                } else if (currentRecords.rentStatus === 'unpaid' || currentRecords.rentStatus === 'overdue') {
                     rentDue += rentAmount;
                 }
 
-                totalElec += records.elecBill || 0;
-                floorElec += records.elecBill || 0;
-                totalWater += records.waterBill || 0;
+                totalElec += currentRecords.elecBill || 0;
+                totalWater += currentRecords.waterBill || 0;
+                if (currentRecords.rentStatus === 'overdue') overdueCount++;
 
-                if (records.rentStatus === 'overdue') overdueCount++;
+                // Process historical records for the graph
+                if (unit.monthlyRecords) {
+                    Object.entries(unit.monthlyRecords).forEach(([mKey, data]) => {
+                        if (utilityTrendMap[mKey]) {
+                            utilityTrendMap[mKey].elecTotal += Number(data.elecBill) || 0;
+                            utilityTrendMap[mKey].waterTotal += Number(data.waterBill) || 0;
+                        }
+                    });
+                }
             });
-
-            if (floorRent > 0 || floorElec > 0) {
-                floorData.unshift({
-                    name: floor.name,
-                    rent: floorRent,
-                    elec: floorElec
-                }); // unshift to order ground -> top
-            }
         });
 
         const runRate = totalRent * 12;
 
-        return { totalRent, totalElec, totalWater, runRate, overdueCount, rentCollected, rentDue, floorData };
-    }, [filters]);
+        // Convert map to sorted array
+        const trendData = Object.values(utilityTrendMap).sort((a, b) => a.month.localeCompare(b.month));
+
+        return { totalRent, totalElec, totalWater, runRate, overdueCount, rentCollected, rentDue, trendData };
+    }, [filters, currentMonth]);
 
     const formatIN = (num) => new Intl.NumberFormat('en-IN', {
         style: 'currency', currency: 'INR', maximumFractionDigits: 0
@@ -123,61 +141,62 @@ export default function Dashboard() {
             </div>
 
             {/* Visual Analytics Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
 
-                {/* Floor breakdown Bar Chart */}
+                {/* Historical Utility Trend Line Chart */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                    <h3 className="text-sm font-bold text-slate-800 tracking-tight mb-6">Revenue & Energy by Floor</h3>
-                    <div className="h-64 w-full">
+                    <h3 className="text-sm font-bold text-slate-800 tracking-tight mb-6 flex items-center gap-2">
+                        <TrendingUp size={16} className="text-blue-500" />
+                        Utility Bill Trends (From Jan 2026)
+                    </h3>
+                    <div className="h-72 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={metrics.floorData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
-                                <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tickFormatter={formatShortIN} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tickFormatter={formatShortIN} tick={{ fontSize: 10, fill: '#f59e0b' }} />
-                                <Tooltip
-                                    cursor={{ fill: '#f1f5f9' }}
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => formatIN(value)}
+                            <LineChart data={metrics.trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis
+                                    dataKey="month"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 10, fill: '#64748b' }}
+                                    dy={10}
+                                    tickFormatter={(val) => {
+                                        const date = new Date(val + '-01');
+                                        return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                                    }}
                                 />
-                                <Bar yAxisId="left" dataKey="rent" name="Rent Collection" radius={[4, 4, 0, 0]}>
-                                    {metrics.floorData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill="#0f172a" />
-                                    ))}
-                                </Bar>
-                                <Bar yAxisId="right" dataKey="elec" name="Electricity Usage" radius={[4, 4, 0, 0]}>
-                                    {metrics.floorData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill="#fcd34d" />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickFormatter={formatShortIN}
+                                    tick={{ fontSize: 10, fill: '#64748b' }}
+                                />
+                                <Tooltip
+                                    cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value) => formatIN(value)}
+                                    labelFormatter={(label) => `Billing Month: ${label}`}
+                                />
+                                <Legend wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
 
-                {/* Financial Flow Area Chart (Mock Data) */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm text-white">
-                    <h3 className="text-sm font-bold text-white tracking-tight mb-6">6-Month Collection Trend</h3>
-                    <div className="h-64 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={[
-                                { month: 'Sep', rec: 180000 }, { month: 'Oct', rec: 195000 }, { month: 'Nov', rec: 200000 },
-                                { month: 'Dec', rec: 220000 }, { month: 'Jan', rec: 245000 }, { month: 'Feb', rec: 254000 }
-                            ]} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorRec" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tickFormatter={formatShortIN} tick={{ fontSize: 10, fill: '#64748b' }} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                                    itemStyle={{ color: '#10b981' }}
-                                    formatter={(value) => formatIN(value)}
+                                <Line
+                                    type="monotone"
+                                    dataKey="elecTotal"
+                                    name="Electricity Bills"
+                                    stroke="#f59e0b"
+                                    strokeWidth={3}
+                                    dot={{ r: 4, strokeWidth: 2 }}
+                                    activeDot={{ r: 6, stroke: '#f59e0b', strokeWidth: 0 }}
                                 />
-                                <Area type="monotone" dataKey="rec" name="Received" stroke="#10b981" fillOpacity={1} fill="url(#colorRec)" strokeWidth={3} />
-                            </AreaChart>
+                                <Line
+                                    type="monotone"
+                                    dataKey="waterTotal"
+                                    name="Water Bills"
+                                    stroke="#3b82f6"
+                                    strokeWidth={3}
+                                    dot={{ r: 4, strokeWidth: 2 }}
+                                    activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 0 }}
+                                />
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
                 </div>

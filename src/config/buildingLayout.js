@@ -1,68 +1,17 @@
 export const buildingData = {
     floors: [
         {
-            level: 6,
-            name: "6th Floor",
-            units: [
-                {
-                    id: "601",
-                    name: "Owner's Residence (Upper)",
-                    type: "Private",
-                    contact: "Private",
-                    tenantHistory: [
-                        { name: "Suresh Duggal", company: "Owner", joinDate: "2010-01-01", leaveDate: null }
-                    ],
-                    rentHistory: [],
-                    elecUnit: "MAIN-01",
-                    waterConn: "WTR-01",
-                    isPrivate: true,
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 0, waterBill: 0, garbageBill: 0 }
-                    }
-                }
-            ]
-        },
-        {
             level: 5,
             name: "5th Floor",
             units: [
-                {
-                    id: "501",
-                    name: "Owner's Residence (Lower)",
-                    type: "Private",
-                    contact: "Private",
-                    rentHistory: [],
-                    elecUnit: "MAIN-02",
-                    waterConn: "WTR-02",
-                    isPrivate: true,
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 0, waterBill: 0, garbageBill: 0 }
-                    }
-                }
+                { id: "501", name: "Attic", type: "Private Residence", isPrivate: true, elecUnit: "MAIN-05", waterConn: "WTR-05", garbageId: "N/A", tenantHistory: [], rentHistory: [], monthlyRecords: {} }
             ]
         },
         {
             level: 4,
             name: "4th Floor",
             units: [
-                {
-                    id: "401",
-                    name: "SILVER OAK BnB",
-                    type: "Single Large Unit",
-                    contact: "+91 98765 43210",
-                    tenantHistory: [
-                        { name: "Rahul Sharma", company: "Silver Oak Tourism", joinDate: "2024-03-01", leaveDate: null },
-                        { name: "Priya Singh", company: "Mountain View Stays", joinDate: "2022-01-15", leaveDate: "2024-02-28" }
-                    ],
-                    rentHistory: [{ amount: 120000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-401",
-                    waterConn: "WTR-401",
-                    isProminent: true,
-                    monthlyRecords: {
-                        "2026-01": { rentStatus: "paid", elecBill: 4200, waterBill: 750, garbageBill: 300 },
-                        "2026-02": { rentStatus: "paid", elecBill: 4500, waterBill: 800, garbageBill: 300 }
-                    }
-                }
+                { id: "401", name: "Owner Residence", type: "Private Residence", isPrivate: true, elecUnit: "100001150650", waterConn: "02126456 - 6890", garbageId: "GA236803S1", tenantHistory: [], rentHistory: [], monthlyRecords: {} }
             ]
         },
         {
@@ -70,32 +19,11 @@ export const buildingData = {
             name: "3rd Floor",
             units: [
                 {
-                    id: "301",
-                    name: "3rd Floor 2BHK",
-                    type: "2BHK Flat",
-                    contact: "+91 91234 56789",
-                    tenantHistory: [
-                        { name: "Amit Kumar", company: "TCS", joinDate: "2025-06-01", leaveDate: null }
-                    ],
-                    rentHistory: [{ amount: 35000, startMonth: "2026-01", endMonth: "2026-02" }], // Expiring this cycle for the alert
-                    elecUnit: "MET-301",
-                    waterConn: "WTR-301",
-                    monthlyRecords: {
-                        "2026-01": { rentStatus: "paid", elecBill: 1100, waterBill: 400, garbageBill: 150 },
-                        "2026-02": { rentStatus: "overdue", elecBill: 1200, waterBill: 400, garbageBill: 150 }
-                    }
-                },
-                {
-                    id: "302",
-                    name: "3rd Floor Single",
-                    type: "Single Room",
-                    contact: "+91 99887 76655",
-                    rentHistory: [{ amount: 12000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-302",
-                    waterConn: "WTR-302",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 400, waterBill: 200, garbageBill: 100 }
-                    }
+                    id: "301", name: "Silver Oak BnB (2A)", type: "Full Floor Guest House", isProminent: true,
+                    elecUnit: "100001170249", waterConn: "2126455 - 6889", garbageId: "GA236803S7", contact: "8894212012",
+                    tenantHistory: [{ name: "Silver Oak BnB", company: "8894212012", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 116000, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 }
             ]
         },
@@ -104,44 +32,32 @@ export const buildingData = {
             name: "2nd Floor",
             units: [
                 {
-                    id: "201",
-                    name: "2nd Floor 2BHK (A)",
-                    type: "2BHK Flat",
-                    contact: "+91 98877 66554",
-                    tenantHistory: [
-                        { name: "Vikram Malhotra", company: "Infosys", joinDate: "2023-11-01", leaveDate: null },
-                        { name: "Sneha Gupta", company: "Wipro", joinDate: "2021-08-10", leaveDate: "2023-10-31" }
-                    ],
-                    rentHistory: [{ amount: 35000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-201",
-                    waterConn: "WTR-201",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 1100, waterBill: 400, garbageBill: 150 }
-                    }
+                    id: "201", name: "3C", type: "2RK Flat",
+                    elecUnit: "200000336127", waterConn: "02126456 - 6890", garbageId: "N/A", contact: "9129867561",
+                    tenantHistory: [{ name: "Kamini", company: "9129867561", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 5000, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 },
                 {
-                    id: "202",
-                    name: "2nd Floor 2BHK (B)",
-                    type: "2BHK Flat",
-                    contact: "+91 97766 55443",
-                    rentHistory: [{ amount: 35000, startMonth: "2026-01", endMonth: "2026-03" }], // Expiring soon
-                    elecUnit: "MET-202",
-                    waterConn: "WTR-202",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "unpaid", elecBill: 1300, waterBill: 400, garbageBill: 150 }
-                    }
+                    id: "202", name: "3D", type: "Single Room",
+                    elecUnit: "100001150664", waterConn: "2126458 - 12376", garbageId: "GA236803S4", contact: "9459247055",
+                    tenantHistory: [{ name: "Bhawna", company: "9459247055", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 8740, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 },
                 {
-                    id: "203",
-                    name: "2nd Floor Single",
-                    type: "Single Room",
-                    contact: "+91 96655 44332",
-                    rentHistory: [{ amount: 12000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-203",
-                    waterConn: "WTR-203",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 350, waterBill: 200, garbageBill: 100 }
-                    }
+                    id: "203", name: "3B", type: "Single Room",
+                    elecUnit: "100001150666", waterConn: "02126456 - 6890", garbageId: "N/A", contact: "8219556586",
+                    tenantHistory: [{ name: "Sunita", company: "8219556586", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 5500, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
+                },
+                {
+                    id: "204", name: "3A", type: "3-Room Unit",
+                    elecUnit: "100001150668", waterConn: "2126458 - 12376", garbageId: "GA236803S6", contact: "9418343783",
+                    tenantHistory: [{ name: "Kalpana", company: "9418343783", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 10660, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 }
             ]
         },
@@ -150,31 +66,18 @@ export const buildingData = {
             name: "1st Floor",
             units: [
                 {
-                    id: "101",
-                    name: "1st Floor 2BHK",
-                    type: "2BHK Flat (AirBnb)",
-                    contact: "+91 95544 33221",
-                    rentHistory: [{ amount: 45000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-101",
-                    waterConn: "WTR-101",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 2200, waterBill: 600, garbageBill: 200 }
-                    }
+                    id: "101", name: "4B", type: "2RK AirBnB", isProminent: true,
+                    elecUnit: "100001150662", waterConn: "02126456 - 6890", garbageId: "GA236803S3", contact: "9418272337",
+                    tenantHistory: [{ name: "Pine and Thatch", company: "9418272337", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 0, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 },
                 {
-                    id: "102",
-                    name: "1st Floor Small Flat",
-                    type: "Small Flat",
-                    contact: "+91 94433 22110",
-                    tenantHistory: [
-                        { name: "Aditi Rao", company: "Freelancer", joinDate: "2025-01-10", leaveDate: null }
-                    ],
-                    rentHistory: [{ amount: 20000, startMonth: "2026-01", endMonth: "2026-02" }], // Expiring this cycle
-                    elecUnit: "MET-102",
-                    waterConn: "WTR-102",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "overdue", elecBill: 600, waterBill: 250, garbageBill: 100 }
-                    }
+                    id: "102", name: "4A", type: "2RK Flat",
+                    elecUnit: "100001150656", waterConn: "02126458 - 12376", garbageId: "GA236803S5", contact: "9816593357",
+                    tenantHistory: [{ name: "Rahul", company: "9816593357", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 8400, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 }
             ]
         },
@@ -183,16 +86,18 @@ export const buildingData = {
             name: "Ground Floor",
             units: [
                 {
-                    id: "001",
-                    name: "Ground Floor Flat",
-                    type: "Flat",
-                    contact: "+91 93322 11009",
-                    rentHistory: [{ amount: 25000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-001",
-                    waterConn: "WTR-001",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 800, waterBill: 300, garbageBill: 150 }
-                    }
+                    id: "001", name: "5A", type: "1BHK Flat",
+                    elecUnit: "200002060486", waterConn: "02126458 - 12376", garbageId: "GA236803S2", contact: "7018827553",
+                    tenantHistory: [{ name: "Chetna", company: "7018827553", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 8287, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
+                },
+                {
+                    id: "002", name: "5B", type: "Single Room",
+                    elecUnit: "100001183959", waterConn: "02126456 - 6890", garbageId: "N/A", contact: "8019298624",
+                    tenantHistory: [{ name: "Meera", company: "8019298624", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 4000, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 }
             ]
         },
@@ -201,28 +106,18 @@ export const buildingData = {
             name: "Basement",
             units: [
                 {
-                    id: "B01",
-                    name: "Basement Studio 1",
-                    type: "1 RK Studio",
-                    contact: "+91 92211 00998",
-                    rentHistory: [{ amount: 10000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-B01",
-                    waterConn: "WTR-B01",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 300, waterBill: 150, garbageBill: 50 }
-                    }
+                    id: "B01", name: "6B", type: "Studio",
+                    elecUnit: "200000336121", waterConn: "02126456 - 6890", garbageId: "GA236803S8", contact: "9418344290",
+                    tenantHistory: [{ name: "Leena Thakur", company: "9418344290", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 8500, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 },
                 {
-                    id: "B02",
-                    name: "Basement Studio 2",
-                    type: "1 RK Studio",
-                    contact: "+91 91100 99887",
-                    rentHistory: [{ amount: 10000, startMonth: "2026-01", endMonth: "2026-11" }],
-                    elecUnit: "MET-B02",
-                    waterConn: "WTR-B02",
-                    monthlyRecords: {
-                        "2026-02": { rentStatus: "paid", elecBill: 250, waterBill: 150, garbageBill: 50 }
-                    }
+                    id: "B02", name: "6A", type: "Studio",
+                    elecUnit: "200002060517", waterConn: "02126456 - 6890", garbageId: "GA236803S8", contact: "8580544562",
+                    tenantHistory: [{ name: "Amit", company: "8580544562", joinDate: "2026-01-01", leaveDate: "2029-01-01" }],
+                    rentHistory: [{ amount: 8500, startMonth: "2026-01", endMonth: null }],
+                    monthlyRecords: {}
                 }
             ]
         }

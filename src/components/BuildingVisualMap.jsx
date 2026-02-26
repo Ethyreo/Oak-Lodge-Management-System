@@ -49,10 +49,10 @@ export default function BuildingVisualMap({ onSelectUnit }) {
 
                             {floor.units.map(unit => {
                                 const isFilteredOut =
-                                    (filters.floor !== 'all' && filters.floor !== floor.level.toString()) ||
-                                    (filters.unit !== 'all' && filters.unit !== unit.id) ||
-                                    (filters.elec !== 'all' && filters.elec !== unit.elecUnit) ||
-                                    (filters.water !== 'all' && filters.water !== unit.waterConn);
+                                    (filters.floor?.length > 0 && !filters.floor.includes(floor.level.toString())) ||
+                                    (filters.unit?.length > 0 && !filters.unit.includes(unit.id)) ||
+                                    (filters.elec?.length > 0 && !filters.elec.includes(unit.elecUnit)) ||
+                                    (filters.water?.length > 0 && !filters.water.includes(unit.waterConn));
 
                                 return (
                                     <motion.button

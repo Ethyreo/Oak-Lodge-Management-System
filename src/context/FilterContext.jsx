@@ -4,10 +4,10 @@ const FilterContext = createContext();
 
 export function FilterProvider({ children }) {
     const [filters, setFilters] = useState({
-        floor: 'all',
-        unit: 'all',
-        elec: 'all',
-        water: 'all'
+        floor: [],
+        unit: [],
+        elec: [],
+        water: []
     });
 
     const updateFilter = (key, value) => {
@@ -15,7 +15,7 @@ export function FilterProvider({ children }) {
     };
 
     const resetFilters = () => {
-        setFilters({ floor: 'all', unit: 'all', elec: 'all', water: 'all' });
+        setFilters({ floor: [], unit: [], elec: [], water: [] });
     };
 
     return (

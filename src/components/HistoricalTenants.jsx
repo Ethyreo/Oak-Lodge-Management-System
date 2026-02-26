@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { buildingData } from '../config/buildingLayout';
-import { Search, ArrowLeft, History, Users } from 'lucide-react';
+import { Search, ArrowLeft, History, Users, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getTodayDateString } from '../utils/tenantLogic';
 
-export default function HistoricalTenants({ onBack }) {
+export default function HistoricalTenants({ onBack, onManageTenants }) {
     const [searchTerm, setSearchTerm] = useState('');
 
     // Extract all tenant history from all units into a flat array
@@ -70,17 +71,28 @@ export default function HistoricalTenants({ onBack }) {
                     </div>
                 </div>
 
-                <div className="relative w-full sm:w-64">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <Search size={16} className="text-slate-400" />
+                <div className="flex gap-3 w-full sm:w-auto items-center">
+                    <div className="relative flex-1 sm:w-64">
+                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                            <Search size={16} className="text-slate-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search Name or Unit..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl block w-full pl-10 pr-3 py-2.5 outline-none focus:border-slate-800 transition-colors"
+                        />
                     </div>
-                    <input
-                        type="text"
-                        placeholder="Search Name or Unit..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl block w-full pl-10 pr-3 py-2.5 outline-none focus:border-slate-800 transition-colors"
-                    />
+                    {/* Phase 7 / 8: Onboard Tenant Hook */}
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={onManageTenants}
+                        className="bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 shadow-md hover:bg-slate-800 transition-colors shrink-0"
+                    >
+                        <UserPlus size={16} /> <span className="hidden sm:inline">Manage</span>
+                    </motion.button>
                 </div>
             </div>
 
@@ -102,7 +114,10 @@ export default function HistoricalTenants({ onBack }) {
                             <div className="text-center py-8 text-slate-500 text-sm font-medium">No tenants found matching your search.</div>
                         ) : (
                             filteredTenants.map((tenant, index) => {
-                                const isCurrent = tenant.leaveDate === null;
+                                const today = getTodayDateString();
+                                const isArchived = tenant.leaveDate && tenant.leaveDate !== 'Current' && tenant.leaveDate < today;
+                                const isFuture = tenant.joinDate > today;
+                                const isActive = !isArchived && !isFuture;
 
                                 return (
                                     <motion.div
@@ -110,12 +125,15 @@ export default function HistoricalTenants({ onBack }) {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.03 }}
                                         key={`${tenant.unitId}-${index}`}
-                                        className="grid grid-cols-[1.5fr_1.5fr_1fr_1fr] gap-4 items-center hover:bg-slate-50 p-2 -mx-2 rounded-xl transition-colors"
+                                        className={`grid grid-cols-[1.5fr_1.5fr_1fr_1fr] gap-4 items-center p-2 -mx-2 rounded-xl transition-colors ${isArchived ? 'opacity-60 hover:opacity-100 hover:bg-slate-50' : 'hover:bg-slate-50'}`}
                                     >
 
                                         {/* Name & Company */}
                                         <div className="truncate pl-2">
-                                            <p className="text-sm font-bold text-slate-900 truncate">{tenant.name}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm font-bold text-slate-900 truncate">{tenant.name}</p>
+                                                {isFuture && <span className="bg-blue-100 text-blue-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">Incoming</span>}
+                                            </div>
                                             {tenant.company && (
                                                 <p className="text-[10px] font-medium text-slate-500 mt-0.5 truncate">{tenant.company}</p>
                                             )}
@@ -128,13 +146,13 @@ export default function HistoricalTenants({ onBack }) {
                                         </div>
 
                                         {/* Join Date */}
-                                        <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-center">
-                                            <span className="text-sm font-bold text-slate-600">{formatDate(tenant.joinDate)}</span>
+                                        <div className={`border rounded-lg px-3 py-2 text-center ${isFuture ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100'}`}>
+                                            <span className={`text-sm font-bold ${isFuture ? 'text-blue-600' : 'text-slate-600'}`}>{formatDate(tenant.joinDate)}</span>
                                         </div>
 
                                         {/* Leave Date */}
-                                        <div className={`border rounded-lg px-3 py-2 text-center ${isCurrent ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
-                                            <span className={`text-sm font-bold ${isCurrent ? 'text-emerald-600' : 'text-slate-500'}`}>
+                                        <div className={`border rounded-lg px-3 py-2 text-center ${isActive ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                                            <span className={`text-sm font-bold ${isActive ? 'text-emerald-600' : 'text-slate-500'}`}>
                                                 {formatDate(tenant.leaveDate)}
                                             </span>
                                         </div>

@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, ChevronRight } from 'lucide-react';
 import { getExpiringRentCycles } from '../utils/rentUtils';
 import { buildingData } from '../config/buildingLayout';
+import { getCurrentBillingMonth } from '../utils/dateUtils';
 
 export default function RentAlert({ onSelectUnit, updateTrigger }) {
     const [expiringUnits, setExpiringUnits] = useState([]);
     const [isVisible, setIsVisible] = useState(true);
 
-    const currentMonth = "2026-02"; // Mock system time
+    const currentMonth = getCurrentBillingMonth(); // Dynamic system time
 
     useEffect(() => {
         // Find units whose rent cycle ends within 1 month
