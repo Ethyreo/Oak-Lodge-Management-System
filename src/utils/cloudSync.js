@@ -16,7 +16,8 @@ export const pushBuildingStateToCloud = async (selectedMonth) => {
                 if (unit.isPrivate) return;
 
                 // 1. Sync Static Config Data -> Units Collection
-                promises.push(setDoc(doc(db, "Units", unit.id), {
+                const unitId = unit.id.trim();
+                promises.push(setDoc(doc(db, "Units", unitId), {
                     UnitID: unit.id,
                     UnitName: unit.name,
                     Type: unit.type || '',
@@ -29,7 +30,7 @@ export const pushBuildingStateToCloud = async (selectedMonth) => {
                 // 2. Sync Tenant Directory -> Tenants Collection
                 if (unit.tenantHistory && unit.tenantHistory.length > 0) {
                     unit.tenantHistory.forEach(tenant => {
-                        const tId = `${unit.id}_${tenant.name.replace(/\s+/g, '_')}`;
+                        const tId = `${unitId}_${tenant.name.trim().replace(/\s+/g, '_')}`;
                         promises.push(setDoc(doc(db, "Tenants", tId), {
                             UnitID: unit.id,
                             UnitName: unit.name,
@@ -54,7 +55,7 @@ export const pushBuildingStateToCloud = async (selectedMonth) => {
                         activeTenantName = unit.tenantHistory[unit.tenantHistory.length - 1].name;
                     }
 
-                    const ledgerId = `${selectedMonth}_${unit.id}`;
+                    const ledgerId = `${selectedMonth.trim()}_${unitId}`;
                     promises.push(setDoc(doc(db, "Ledger", ledgerId), {
                         BillingMonth: selectedMonth,
                         UnitID: unit.id,
