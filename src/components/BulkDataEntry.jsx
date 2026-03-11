@@ -67,6 +67,20 @@ export default function BulkDataEntry({ onBack, triggerUpdate }) {
         });
     };
 
+    // Handle marking all unpaid/overdue as paid
+    const handleMarkAllPaid = () => {
+        setDraftData(prev => {
+            const newDraft = { ...prev };
+            Object.keys(newDraft).forEach(unitId => {
+                newDraft[unitId] = {
+                    ...newDraft[unitId],
+                    rentStatus: 'paid'
+                };
+            });
+            return newDraft;
+        });
+    };
+
     // 3. Mass Submit Engine (Now connects to local Google Sheets Proxy)
     const handleMassSave = async () => {
         setIsSaving(true);
@@ -170,6 +184,21 @@ export default function BulkDataEntry({ onBack, triggerUpdate }) {
                             className="bg-slate-50 border border-slate-200 text-slate-800 text-sm font-bold rounded-xl block w-full pl-10 pr-3 py-2.5 outline-none focus:border-slate-800 transition-colors"
                         />
                     </div>
+
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleMarkAllPaid}
+                        disabled={isSaving}
+                        className={clsx(
+                            "text-slate-700 font-bold py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-sm border border-slate-200 bg-white transition-colors shrink-0",
+                            isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-50"
+                        )}
+                        title="Mark all units as paid"
+                    >
+                        <IndianRupee size={16} className="text-emerald-600" />
+                        <span className="hidden sm:inline">Mark All Paid</span>
+                    </motion.button>
 
                     <motion.button
                         whileHover={{ scale: 1.02 }}
